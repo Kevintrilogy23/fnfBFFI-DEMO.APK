@@ -46,11 +46,11 @@ jobs:
           haxelib install hscript
           haxelib install tjson
           haxelib install hxIni
-          # Links limpos para evitar o erro "Could not clone" visto no seu log
-          haxelib git extension-androidtools https://github.com/MAJigsaw77/extension-androidtools --quiet
-          haxelib git hxCodec https://github.com/MAJigsaw77/hxCodec --quiet
-          haxelib git flixel-addons https://github.com/HaxeFlixel/flixel-addons --quiet
-          haxelib git linc_luajit https://github.com/Sirox228/linc_luajit --quiet
+          # Usando links completos com .git para garantir o clone estável
+          haxelib git extension-androidtools https://github.com/MAJigsaw77/extension-androidtools.git
+          haxelib git hxCodec https://github.com/MAJigsaw77/hxCodec.git
+          haxelib git flixel-addons https://github.com/HaxeFlixel/flixel-addons.git
+          haxelib git linc_luajit https://github.com/Sirox228/linc_luajit.git
           haxelib list
 
       - name: Setup Lime
