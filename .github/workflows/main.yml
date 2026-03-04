@@ -21,7 +21,6 @@ jobs:
         with:
           ndk-version: r21e
 
-      # Java 17 é necessário para as ferramentas modernas do Android SDK (2026)
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
@@ -47,11 +46,11 @@ jobs:
           haxelib install hscript
           haxelib install tjson
           haxelib install hxIni
-          # Instalando bibliotecas via Git sem o sufixo .git para evitar erros de clone
-          haxelib git extension-androidtools https://github.com/MAJigsaw77/extension-androidtools
-          haxelib git hxCodec https://github.com/MAJigsaw77/hxCodec
-          haxelib git flixel-addons https://github.com/HaxeFlixel/flixel-addons
-          haxelib git linc_luajit https://github.com/Sirox228/linc_luajit
+          # Links limpos para evitar o erro "Could not clone" visto no seu log
+          haxelib git extension-androidtools https://github.com/MAJigsaw77/extension-androidtools --quiet
+          haxelib git hxCodec https://github.com/MAJigsaw77/hxCodec --quiet
+          haxelib git flixel-addons https://github.com/HaxeFlixel/flixel-addons --quiet
+          haxelib git linc_luajit https://github.com/Sirox228/linc_luajit --quiet
           haxelib list
 
       - name: Setup Lime
