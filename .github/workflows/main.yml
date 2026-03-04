@@ -1,39 +1,74 @@
-name: Build Android
-on: [push, pull_request, workflow_dispatch]
+name: Android Build
+
+on:
+  push:
+    branches: [ main ] # Ajustado para sua branch 'main'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
 jobs:
-  build:
+  buildAndroid:
+    name: buildAndroid
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2.3.1
+
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: r21e
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
 
       - name: Setup Haxe
-        uses: krdlab/setup-haxe@v1
+        uses: krdlab/setup-haxe@v1.1.5
         with:
           haxe-version: 4.2.5
 
-      - name: Install Libraries
+      - name: Install Haxelib
         run: |
-          haxelib install lime 8.1.3
-          haxelib install openfl
-          haxelib install flixel
-          haxelib install flixel-addons
+          haxelib setup /home/runner/haxelib
+          haxelib install hxcpp > /dev/null
+          haxelib install lime 7.9.0
+          haxelib install openfl 9.1.0
+          haxelib --never install flixel 4.11.0
           haxelib install flixel-ui
+          haxelib install hscript
           haxelib install tjson
           haxelib install hxIni
-          haxelib git hxvlc https://github.com/MAJigsaw77/hxvlc
-          haxelib git linc_luajit https://github.com/nebulazorua/linc_luajit
-          haxelib git extension-androidtools https://github.com/MaysLastSigh/extension-androidtools
-          haxelib run lime setup android
+          haxelib --quiet git extension-androidtools https://github.com/MAJigsaw77/extension-androidtools.git
+          haxelib --quiet git hxCodec https://github.com/MAJigsaw77/hxCodec.git
+          haxelib git flixel-addons https://github.com/ninjamuffin99/flixel-addons
+          haxelib git linc_luajit https://github.com/Sirox228/linc_luajit.git
+          haxelib list
 
-      - name: Build Android
+      - name: Setup Lime
+        run: |
+          haxelib run lime setup -alias -y
+          haxelib run lime config ANDROID_SDK $ANDROID_HOME
+          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_HOME
+          haxelib run lime config JAVA_HOME $JAVA_HOME
+          haxelib run lime config ANDROID_SETUP true
+          haxelib set lime 7.9.0 -y
+          haxelib set openfl 9.1.0 -y
+          haxelib set flixel 4.11.0 -y
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+
+      - name: Compile
         run: haxelib run lime build android -release
-        
-      - name: Upload APK
-        uses: actions/upload-artifact@v3
+
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v2.2.4
         with:
-          name: Baldi-Android-APK
+          name: Baldi-Android-Build
           path: export/release/android/bin/app/build/outputs/apk/release/*.apk
